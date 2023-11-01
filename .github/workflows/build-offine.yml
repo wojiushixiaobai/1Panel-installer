@@ -1,0 +1,70 @@
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 1 * * *'
+
+name: Checkout and Create Release Version
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check Version
+        id: get-version
+        run: |
+          version=$(curl -s 'https://api.github.com/repos/wojiushixiaobai/1Panel-loongarch64/releases/latest' | jq -r ".tag_name")
+          echo "version=${version}" >> $GITHUB_OUTPUT
+          docker_version=$(curl -s 'https://api.github.com/repos/wojiushixiaobai/docker-ce-binaries-loongarch64/releases/latest' | jq -r ".tag_name")
+          compose_version=$(curl -s 'https://api.github.com/repos/wojiushixiaobai/compose-loongarch64/releases/latest' | jq -r ".tag_name")
+          echo "app_version=${version}" >> $GITHUB_OUTPUT
+          echo "docker_version=${docker_version}" >> $GITHUB_OUTPUT
+          echo "compose_version=${compose_version}" >> $GITHUB_OUTPUT
+
+      - name: Check Release
+        id: check-release
+        run: |
+          gh release view ${{ steps.get-version.outputs.version }} -R wojiushixiaobai/1Panel-installer >/dev/null 2>&1 || echo "create=1" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check Buile
+        id: check-build
+        run: |
+          gh release view ${{ steps.get-version.outputs.version }} -R wojiushixiaobai/1Panel-installer | grep web-${{ steps.get-version.outputs.version }}.tar.gz >/dev/null 2>&1 || echo "build=1" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Tag
+        run: |
+          sed -i "s@ARG VERSION=.*@ARG VERSION=${{ steps.get-version.outputs.version }}@" Dockerfile
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${{ steps.get-version.outputs.version }}" -m "Release ${{ steps.get-version.outputs.version }}" || true
+          git push origin "${{ steps.get-version.outputs.version }}" || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        if: steps.check-release.outputs.create == 1
+        run: |
+          gh release create ${{ steps.get-version.outputs.version }} --notes "Release ${{ steps.get-version.outputs.version }}" -R wojiushixiaobai/1Panel-installer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Make Offine
+        if: steps.check-build.outputs.build == 1
+        run: |
+          chmod +x prepare.sh
+          ./prepare.sh --app_version ${{ steps.get-version.outputs.app_version }} --docker_version ${{ steps.get-version.outputs.docker_version }} --compose_version ${{ steps.get-version.outputs.compose_version }}
+
+      - name: Upgrade Release
+        if: steps.check-build.outputs.build == 1
+        run: |
+          gh release upload ${{ steps.get-version.outputs.version }} build/${{ steps.get-version.outputs.version }}/* -R wojiushixiaobai/1Panel-installer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
