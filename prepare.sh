@@ -43,6 +43,10 @@ APP_VERSION=${app_version:-v1.7.4}
 DOCKER_VERSION=${docker_version:-20.10.7}
 COMPOSE_VERSION=${compose_version:-v2.23.0}
 
+if [ -d "build" ]; then
+    rm -rf build/*
+fi
+
 for architecture in x86_64 aarch64 s390x ppc64le loongarch64; do
     cd "${BASE_DIR}" || exit 1
 
@@ -76,15 +80,11 @@ for architecture in x86_64 aarch64 s390x ppc64le loongarch64; do
 
     BUILD_NAME=1panel-${APP_VERSION}-linux-${arch}
     BUILD_DIR=build/${APP_VERSION}/${BUILD_NAME}
-    if [ ! -d "${BUILD_DIR}" ]; then
-        mkdir -p "${BUILD_DIR}"
-    fi
+    mkdir -p "${BUILD_DIR}"
 
     BUILD_OFFLINE_NAME=1panel-${APP_VERSION}-offline-linux-${arch}
     BUILD_OFFLINE_DIR=build/${APP_VERSION}/${BUILD_OFFLINE_NAME}
-    if [ ! -d "${BUILD_OFFLINE_DIR}" ]; then
-        mkdir -p "${BUILD_OFFLINE_DIR}"
-    fi
+    mkdir -p "${BUILD_OFFLINE_DIR}"
 
     if [ ! -f "build/1panel-${APP_VERSION}-linux-${arch}.tar.gz" ]; then
         wget -q "${APP_BIN_URL}" -O "build/1panel-${APP_VERSION}-linux-${arch}.tar.gz"
@@ -107,13 +107,6 @@ for architecture in x86_64 aarch64 s390x ppc64le loongarch64; do
     chmod +x "${BUILD_OFFLINE_DIR}/docker-compose"
 
     cd "build/${APP_VERSION}" || exit 1
-
-    if [ -f "${BUILD_NAME}.tar.gz" ]; then
-        rm -f "${BUILD_NAME}.tar.gz"
-    fi
-    if [ -f "${BUILD_OFFLINE_NAME}.tar.gz" ]; then
-        rm -f "${BUILD_OFFLINE_NAME}.tar.gz"
-    fi
     tar -zcf "${BUILD_NAME}.tar.gz" "${BUILD_NAME}"
     tar -zcf "${BUILD_OFFLINE_NAME}.tar.gz" "${BUILD_OFFLINE_NAME}"
 done

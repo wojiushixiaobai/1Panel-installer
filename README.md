@@ -35,7 +35,7 @@ Global Options:
   --entrance  	 Configure 1Panel web security access in the Installation Phase.
   --install-dir  Configure 1Panel install directory in the Installation Phase.
 
-For more help on how to use Docker, head to https://1panel.cn/docs/
+For more help options on how to use 1Panel, head to https://1panel.cn/docs/
 
 ```
 

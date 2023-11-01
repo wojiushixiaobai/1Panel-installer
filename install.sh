@@ -25,7 +25,7 @@ while [[ $# > 0 ]]; do
             echo -e "  --entrance  \t Configure 1Panel web security access in the Installation Phase."
             echo -e "  --install-dir  Configure 1Panel install directory in the Installation Phase."
             echo
-            echo "For more help, head to https://1panel.cn/docs/"
+            echo "For more help options on how to use 1Panel, head to https://1panel.cn/docs/"
             exit 0
             ;;
         -v|--version)
@@ -66,6 +66,7 @@ PANEL_USER=${PANEL_USER:-"admin"}
 PANEL_PASSWORD=${PANEL_PASSWORD:-""}
 PANEL_ENTRANCE=${PANEL_ENTRANCE:-"secret"}
 INSTALL_DIR=${INSTALL_DIR:-"/opt/1panel"}
+INSTALL_CHECK=0
 
 if [ -f "/usr/bin/1pctl" ]; then
     VERSION=$(grep "ORIGINAL_VERSION=" /usr/bin/1pctl | awk -F "=" '{print $2}')
@@ -74,10 +75,12 @@ if [ -f "/usr/bin/1pctl" ]; then
     PANEL_PASSWORD=$(grep "ORIGINAL_PASSWORD=" /usr/bin/1pctl | awk -F "=" '{print $2}')
     PANEL_ENTRANCE=$(grep "ORIGINAL_ENTRANCE=" /usr/bin/1pctl | awk -F "=" '{print $2}')
     INSTALL_DIR=$(grep "BASE_DIR=" /usr/bin/1pctl | awk -F "=" '{print $2}')
+    INSTALL_CHECK=1
 fi
 
 function echo_logo() {
     cat << EOF
+
     ██╗    ██████╗  █████╗ ███╗   ██╗███████╗██╗
    ███║    ██╔══██╗██╔══██╗████╗  ██║██╔════╝██║
    ╚██║    ██████╔╝███████║██╔██╗ ██║█████╗  ██║
@@ -286,7 +289,7 @@ function post_install() {
         PANEL_HOST="127.0.0.1"
     fi
 
-    if [ -f "/usr/bin/1pctl" ]; then
+    if [ "${INSTALL_CHECK}" == "1" ]; then
         echo "=============== 检测到 1Panel 已经安装, 跳过配置 ==============="
     else
         echo "================ 感谢您的耐心等待, 安装已经完成 ================="
