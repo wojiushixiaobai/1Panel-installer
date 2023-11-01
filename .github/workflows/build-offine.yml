@@ -22,7 +22,7 @@ jobs:
           docker_version=$(curl -s 'https://api.github.com/repos/wojiushixiaobai/docker-ce-binaries-loongarch64/releases/latest' | jq -r ".tag_name")
           compose_version=$(curl -s 'https://api.github.com/repos/wojiushixiaobai/compose-loongarch64/releases/latest' | jq -r ".tag_name")
           echo "app_version=${version}" >> $GITHUB_OUTPUT
-          echo "docker_version=${docker_version}" >> $GITHUB_OUTPUT
+          echo "docker_version=${docker_version/v/}" >> $GITHUB_OUTPUT
           echo "compose_version=${compose_version}" >> $GITHUB_OUTPUT
 
       - name: Check Release
@@ -41,7 +41,7 @@ jobs:
 
       - name: Create Tag
         run: |
-          sed -i "s@ARG VERSION=.*@ARG VERSION=${{ steps.get-version.outputs.version }}@" Dockerfile
+          sed -i "s@VERSION=v.*@VERSION=v${{ steps.get-version.outputs.version }}@" install.sh
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git tag -a "${{ steps.get-version.outputs.version }}" -m "Release ${{ steps.get-version.outputs.version }}" || true
@@ -65,6 +65,7 @@ jobs:
       - name: Upgrade Release
         if: steps.check-build.outputs.build == 1
         run: |
-          gh release upload ${{ steps.get-version.outputs.version }} build/${{ steps.get-version.outputs.version }}/* -R wojiushixiaobai/1Panel-installer
+          gh release upload ${{ steps.get-version.outputs.version }} build/${{ steps.get-version.outputs.version }}/*.tar.gz -R wojiushixiaobai/1Panel-installer
+          gh release upload ${{ steps.get-version.outputs.version }} build/${{ steps.get-version.outputs.version }}/checksums.txt -R wojiushixiaobai/1Panel-installer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,10 +2,21 @@
 
 1Panel 离线安装包, 供无法访问外网的用户使用
 
+(*) 注意: 带 `offline` 的是离线安装包, 不带 `offline` 的需要自行部署好 `Docker` 和 `Compose` 环境.
+Docker 手动安装请参考 [Docker 官方文档](https://docs.docker.com/engine/install/#server).
+Compose 手动安装请参考 [Compose 官方文档](https://docs.docker.com/compose/install/).
+
 ## 食用方法
 
-下载对应版本的离线安装包, 解压后运行 `install.sh` 或者 `upgrade.sh` 即可安装或者升级
+下载对应版本的离线安装包, 解压后运行 `install.sh` 或者 `upgrade.sh` 即可安装或者升级.
 
+### 环境依赖
+
+请使用 `root` 用户执行安装脚本, 并且确保环境中已经存在下面命令:
+
+- [x] tar
+- [x] iptabls
+- [x] systemd
 
 ### 参数说明
 
