@@ -2,8 +2,9 @@
 
 1Panel 离线安装包, 供无法访问外网的用户使用
 
-(*) 注意: 带 `offline` 的是离线安装包, 不带 `offline` 的需要自行部署好 `Docker` 和 `Compose` 环境.
-Docker 手动安装请参考 [Docker 官方文档](https://docs.docker.com/engine/install/#server).
+(*) 注意: 带 `offline` 的是离线安装包, 不带 `offline` 的需要自行部署好 `Docker` 和 `Compose` 环境.  
+
+Docker 手动安装请参考 [Docker 官方文档](https://docs.docker.com/engine/install/#server).  
 Compose 手动安装请参考 [Compose 官方文档](https://docs.docker.com/compose/install/).
 
 ## 食用方法

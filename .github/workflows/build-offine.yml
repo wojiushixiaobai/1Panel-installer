@@ -35,7 +35,7 @@ jobs:
       - name: Check Buile
         id: check-build
         run: |
-          gh release view ${{ steps.get-version.outputs.version }} -R wojiushixiaobai/1Panel-installer | grep web-${{ steps.get-version.outputs.version }}.tar.gz >/dev/null 2>&1 || echo "build=1" >> $GITHUB_OUTPUT
+          gh release view ${{ steps.get-version.outputs.version }} -R wojiushixiaobai/1Panel-installer | grep 1panel-{{ steps.get-version.outputs.version }}-offline-linux-loong64.tar.gz >/dev/null 2>&1 || echo "build=1" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,7 +65,7 @@ jobs:
       - name: Upgrade Release
         if: steps.check-build.outputs.build == 1
         run: |
-          gh release upload ${{ steps.get-version.outputs.version }} build/${{ steps.get-version.outputs.version }}/*.tar.gz -R wojiushixiaobai/1Panel-installer
-          gh release upload ${{ steps.get-version.outputs.version }} build/${{ steps.get-version.outputs.version }}/checksums.txt -R wojiushixiaobai/1Panel-installer
+          gh release upload ${{ steps.get-version.outputs.version }} build/${{ steps.get-version.outputs.version }}/*.tar.gz -R wojiushixiaobai/1Panel-installer --clobber
+          gh release upload ${{ steps.get-version.outputs.version }} build/${{ steps.get-version.outputs.version }}/checksums.txt -R wojiushixiaobai/1Panel-installer --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -119,5 +119,5 @@ for architecture in x86_64 aarch64 s390x ppc64le loongarch64; do
 done
 
 cd "${BASE_DIR}/build/${APP_VERSION}" || exit 1
-sha256sum 1panel-${APP_VERSION}-offline-linux-*.tar.gz > checksums.txt
+sha256sum 1panel-*.tar.gz > checksums.txt
 ls -al "${BASE_DIR}/build/${APP_VERSION}"
