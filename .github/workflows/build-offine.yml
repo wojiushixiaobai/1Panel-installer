@@ -41,7 +41,7 @@ jobs:
 
       - name: Create Tag
         run: |
-          sed -i "s@VERSION=v.*@VERSION=v${{ steps.get-version.outputs.version }}@" install.sh
+          sed -i "s@VERSION=v.*@VERSION=${{ steps.get-version.outputs.version }}@" install.sh
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git tag -a "${{ steps.get-version.outputs.version }}" -m "Release ${{ steps.get-version.outputs.version }}" || true

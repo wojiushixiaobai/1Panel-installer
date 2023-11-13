@@ -102,9 +102,12 @@ for architecture in x86_64 aarch64 s390x ppc64le loongarch64; do
         wget -q "${COMPOSE_BIN_URL}" -O "${BUILD_OFFLINE_DIR}/docker-compose"
     fi
 
+    cp -f docker.service "${BUILD_DIR}"
+    cp -f docker.service "${BUILD_OFFLINE_DIR}"
     cp -f install.sh "${BUILD_DIR}"
     cp -f install.sh "${BUILD_OFFLINE_DIR}"
     chmod +x "${BUILD_OFFLINE_DIR}/docker-compose"
+    chmod +x "${BUILD_DIR}/install.sh" "${BUILD_OFFLINE_DIR}/install.sh"
 
     cd "build/${APP_VERSION}" || exit 1
     tar -zcf "${BUILD_NAME}.tar.gz" "${BUILD_NAME}"
