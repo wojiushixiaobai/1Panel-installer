@@ -57,7 +57,7 @@ For more help options on how to use 1Panel, head to https://1panel.cn/docs/
 
 ### 升级
 
-升级没有参数, 直接执行即可.
+~~升级没有参数, 直接执行即可.~~ 需要通过在线升级, 等待后续优化.
 
 ```bash
 ./upgrade.sh

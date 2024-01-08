@@ -35,7 +35,7 @@ jobs:
       - name: Check Buile
         id: check-build
         run: |
-          gh release view ${{ steps.get-version.outputs.version }} -R wojiushixiaobai/1Panel-installer | grep 1panel-{{ steps.get-version.outputs.version }}-offline-linux-loong64.tar.gz >/dev/null 2>&1 || echo "build=1" >> $GITHUB_OUTPUT
+          gh release view ${{ steps.get-version.outputs.version }} -R wojiushixiaobai/1Panel-installer | grep 1panel-.*-offline-linux-loong64.tar.gz >/dev/null 2>&1 || echo "build=1" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -44,6 +44,8 @@ jobs:
           sed -i "s@VERSION=v.*@VERSION=${{ steps.get-version.outputs.version }}@" install.sh
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git add .
+          git commit -m "Release ${{ steps.get-version.outputs.version }}"
           git tag -a "${{ steps.get-version.outputs.version }}" -m "Release ${{ steps.get-version.outputs.version }}" || true
           git push origin "${{ steps.get-version.outputs.version }}" || true
         env:
