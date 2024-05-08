@@ -47,53 +47,53 @@ if [ -d "build" ]; then
     rm -rf build/*
 fi
 
-for architecture in x86_64 aarch64 s390x ppc64le loongarch64; do
+for ARCHITECTURE in x86_64 aarch64 s390x ppc64le loongarch64; do
     cd "${BASE_DIR}" || exit 1
 
-    if [ "${architecture}" == "x86_64" ]; then
-        arch="amd64"
-    fi
-    if [ "${architecture}" == "aarch64" ]; then
-        arch="arm64"
-    fi
-    if [ "${architecture}" == "loongarch64" ]; then
-        arch="loong64"
-    fi
-    if [ "${architecture}" == "s390x" ]; then
-        arch="s390x"
-    fi
-    if [ "${architecture}" == "ppc64le" ]; then
-        arch="ppc64le"
-    fi
+    case "${ARCHITECTURE}" in
+        "x86_64")
+            ARCH="amd64"
+            ;;
+        "aarch64")
+            ARCH="arm64"
+            ;;
+        "loongarch64")
+            ARCH="loong64"
+            ;;
+        "s390x")
+            ARCH="s390x"
+            ;;
+        "ppc64le")
+            ARCH="ppc64le"
+            ;;
+    esac
 
-    APP_BIN_URL="https://github.com/wanghe-fit2cloud/1Panel/releases/download/${APP_VERSION}/1panel-${APP_VERSION}-linux-${arch}.tar.gz"
-    DOCKER_BIN_URL="https://download.docker.com/linux/static/stable/${architecture}/docker-${DOCKER_VERSION}.tgz"
-    COMPOSE_BIN_URL="https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${architecture}"
-    if [ "${architecture}" == "loongarch64" ]; then
-        APP_BIN_URL="https://github.com/wojiushixiaobai/1Panel-${architecture}/releases/download/${APP_VERSION}/1panel-${APP_VERSION}-linux-${arch}.tar.gz"
-        DOCKER_BIN_URL="https://github.com/wojiushixiaobai/docker-ce-binaries-${architecture}/releases/download/v${DOCKER_VERSION}/docker-${DOCKER_VERSION}.tgz"
-        COMPOSE_BIN_URL="https://github.com/wojiushixiaobai/compose-${architecture}/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${architecture}"
-    fi
-    if [ "${architecture}" == "s390x" ]; then
-        DOCKER_BIN_URL="https://github.com/wojiushixiaobai/docker-ce-binaries-${architecture}/releases/download/v${DOCKER_VERSION}/docker-${DOCKER_VERSION}.tgz"
-    fi
-    if [ "${architecture}" == "ppc64le" ]; then
-        DOCKER_BIN_URL="https://download.docker.com/linux/static/stable/${architecture}/docker-18.06.3-ce.tgz"
-    fi
+    APP_BIN_URL="https://github.com/wojiushixiaobai/1Panel-loongarch64/releases/download/${APP_VERSION}/1panel-${APP_VERSION}-linux-${ARCH}.tar.gz"
+    DOCKER_BIN_URL="https://download.docker.com/linux/static/stable/${ARCHITECTURE}/docker-${DOCKER_VERSION}.tgz"
+    COMPOSE_BIN_URL="https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${ARCHITECTURE}"
+    case "${ARCHITECTURE}" in
+        "loongarch64")
+            DOCKER_BIN_URL="https://github.com/wojiushixiaobai/docker-ce-binaries-${ARCHITECTURE}/releases/download/v${DOCKER_VERSION}/docker-${DOCKER_VERSION}.tgz"
+            COMPOSE_BIN_URL="https://github.com/wojiushixiaobai/compose-${ARCHITECTURE}/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${ARCHITECTURE}"
+            ;;
+        "s390x"|"ppc64le")
+            DOCKER_BIN_URL="https://github.com/wojiushixiaobai/docker-ce-binaries-${ARCHITECTURE}/releases/download/v${DOCKER_VERSION}/docker-${DOCKER_VERSION}.tgz"
+            ;;
+    esac
 
-    BUILD_NAME=1panel-${APP_VERSION}-linux-${arch}
+    BUILD_NAME=1panel-${APP_VERSION}-linux-${ARCH}
     BUILD_DIR=build/${APP_VERSION}/${BUILD_NAME}
     mkdir -p "${BUILD_DIR}"
 
-    BUILD_OFFLINE_NAME=1panel-${APP_VERSION}-offline-linux-${arch}
+    BUILD_OFFLINE_NAME=1panel-${APP_VERSION}-offline-linux-${ARCH}
     BUILD_OFFLINE_DIR=build/${APP_VERSION}/${BUILD_OFFLINE_NAME}
     mkdir -p "${BUILD_OFFLINE_DIR}"
 
-    if [ ! -f "build/1panel-${APP_VERSION}-linux-${arch}.tar.gz" ]; then
-        wget -q "${APP_BIN_URL}" -O "build/1panel-${APP_VERSION}-linux-${arch}.tar.gz"
+    if [ ! -f "build/1panel-${APP_VERSION}-linux-${ARCH}.tar.gz" ]; then
+        wget -q "${APP_BIN_URL}" -O "build/1panel-${APP_VERSION}-linux-${ARCH}.tar.gz"
     fi
-    tar -xf "build/1panel-${APP_VERSION}-linux-${arch}.tar.gz" -C "${BUILD_DIR}" --strip-components=1
-    tar -xf "build/1panel-${APP_VERSION}-linux-${arch}.tar.gz" -C "${BUILD_OFFLINE_DIR}" --strip-components=1
+    tar -xf "build/1panel-${APP_VERSION}-linux-${ARCH}.tar.gz" -C "${BUILD_DIR}" --strip-components=1
+    tar -xf "build/1panel-${APP_VERSION}-linux-${ARCH}.tar.gz" -C "${BUILD_OFFLINE_DIR}" --strip-components=1
     rm -f "${BUILD_DIR}/install.sh"
     rm -f "${BUILD_OFFLINE_DIR}/install.sh"
 
