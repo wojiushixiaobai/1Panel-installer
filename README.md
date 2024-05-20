@@ -68,3 +68,9 @@ For more help options on how to use 1Panel, head to https://1panel.cn/docs/
 ```bash
 1panel uninstall
 ```
+
+## 专业版
+
+需要购买专业版可以使用推荐码 [78Ty5WXr](https://www.lxware.cn/?code=78Ty5WXr)，专业版功能请参考 [1Panel 官网](https://1panel.cn/)
+
+![二维码](qrcode.png)
