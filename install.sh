@@ -68,13 +68,13 @@ PANEL_ENTRANCE=${PANEL_ENTRANCE:-"secret"}
 INSTALL_DIR=${INSTALL_DIR:-"/opt/1panel"}
 INSTALL_CHECK=0
 
-if [ -f "/usr/bin/1pctl" ]; then
-    VERSION=$(grep "ORIGINAL_VERSION=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    PANEL_PORT=$(grep "ORIGINAL_PORT=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    PANEL_USER=$(grep "ORIGINAL_USERNAME=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    PANEL_PASSWORD=$(grep "ORIGINAL_PASSWORD=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    PANEL_ENTRANCE=$(grep "ORIGINAL_ENTRANCE=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    INSTALL_DIR=$(grep "BASE_DIR=" /usr/bin/1pctl | awk -F "=" '{print $2}')
+if [ -f "/usr/local/bin/1pctl" ] && [ "${INSTALL_CHECK}" == "0" ]; then
+    VERSION=$(grep "ORIGINAL_VERSION=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    PANEL_PORT=$(grep "ORIGINAL_PORT=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    PANEL_USER=$(grep "ORIGINAL_USERNAME=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    PANEL_PASSWORD=$(grep "ORIGINAL_PASSWORD=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    PANEL_ENTRANCE=$(grep "ORIGINAL_ENTRANCE=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    INSTALL_DIR=$(grep "BASE_DIR=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
     INSTALL_CHECK=1
 fi
 
@@ -206,15 +206,12 @@ function install_1panel() {
         log_error "1panel.service not found"
         exit 1
     fi
-    if grep -q "/usr/local/bin" 1panel.service; then
-        sed -i -e "s#/usr/local/bin#/usr/bin#g" 1panel.service
-    fi
     if [ ! -f "/etc/systemd/system/1panel.service" ]; then
         cp 1panel.service /etc/systemd/system
     fi
-    cp -f 1panel /usr/bin
-    chown root:root /usr/bin/1panel
-    chmod 700 /usr/bin/1panel
+    cp -f 1panel /usr/local/bin
+    chown root:root /usr/local/bin/1panel
+    chmod 700 /usr/local/bin/1panel
     systemctl daemon-reload
     systemctl enable 1panel
     systemctl start 1panel
@@ -231,26 +228,23 @@ function install_1pctl() {
         log_error "1pctl not found"
         exit 1
     fi
-    if [ ! -f "/usr/bin/1pctl" ]; then
-        cp -f 1pctl /usr/bin
+    if [ ! -f "/usr/local/bin/1pctl" ]; then
+        cp -f 1pctl /usr/local/bin
     fi
-    chown root:root /usr/bin/1pctl
-    chmod 700 /usr/bin/1pctl
-    if grep -q "/usr/local/bin" /usr/bin/1pctl; then
-        sed -i -e "s#/usr/local/bin#/usr/bin#g" /usr/bin/1pctl
-    fi
-    sed -i -e "s#BASE_DIR=.*#BASE_DIR=${INSTALL_DIR}#g" /usr/bin/1pctl
-    sed -i -e "s#ORIGINAL_PORT=.*#ORIGINAL_PORT=${PANEL_PORT}#g" /usr/bin/1pctl
-    sed -i -e "s#ORIGINAL_USERNAME=.*#ORIGINAL_USERNAME=${PANEL_USER}#g" /usr/bin/1pctl
+    chown root:root /usr/local/bin/1pctl
+    chmod 700 /usr/local/bin/1pctl
+    sed -i -e "s#BASE_DIR=.*#BASE_DIR=${INSTALL_DIR}#g" /usr/local/bin/1pctl
+    sed -i -e "s#ORIGINAL_PORT=.*#ORIGINAL_PORT=${PANEL_PORT}#g" /usr/local/bin/1pctl
+    sed -i -e "s#ORIGINAL_USERNAME=.*#ORIGINAL_USERNAME=${PANEL_USER}#g" /usr/local/bin/1pctl
 
     if [ -z "${PANEL_PASSWORD}" ]; then
         PANEL_PASSWORD=$(random_str 24)
     fi
-    sed -i -e "s#ORIGINAL_PASSWORD=.*#ORIGINAL_PASSWORD=${PANEL_PASSWORD}#g" /usr/bin/1pctl
+    sed -i -e "s#ORIGINAL_PASSWORD=.*#ORIGINAL_PASSWORD=${PANEL_PASSWORD}#g" /usr/local/bin/1pctl
     if [ -z "${PANEL_ENTRANCE}" ]; then
-        sed -i -e "s#ORIGINAL_ENTRANCE=.*#ORIGINAL_ENTRANCE=''#g" /usr/bin/1pctl
+        sed -i -e "s#ORIGINAL_ENTRANCE=.*#ORIGINAL_ENTRANCE=''#g" /usr/local/bin/1pctl
     else
-        sed -i -e "s#ORIGINAL_ENTRANCE=.*#ORIGINAL_ENTRANCE=${PANEL_ENTRANCE}#g" /usr/bin/1pctl
+        sed -i -e "s#ORIGINAL_ENTRANCE=.*#ORIGINAL_ENTRANCE=${PANEL_ENTRANCE}#g" /usr/local/bin/1pctl
     fi
 }
 
@@ -273,12 +267,15 @@ function random_str() {
 }
 
 function get_host_ip() {
-  host=$(command -v ip &> /dev/null && ip addr | grep 'state UP' -A2 | grep inet | grep -Ev '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1)
+  local default_ip="127.0.0.1"
+  host=$(command -v hostname &>/dev/null && hostname -I | cut -d ' ' -f1)
   if [ ! "${host}" ]; then
-      host=$(hostname -I | cut -d ' ' -f1)
+      host=$(command -v ip &>/dev/null && ip addr | grep 'inet ' | grep -Ev '(127.0.0.1|inet6|docker)' | awk '{print $2}' | head -n 1 | cut -d / -f1)
   fi
   if [[ ${host} =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
       echo "${host}"
+  else
+      echo "${default_ip}"
   fi
 }
 

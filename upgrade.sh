@@ -7,14 +7,31 @@ if [ ! "$(echo $PATH | grep /usr/local/bin)" ]; then
     export PATH=/usr/local/bin:$PATH
 fi
 
-if [ -f "/usr/bin/1pctl" ] && [ -f "1pctl" ]; then
+tmp_dir=$(mktemp -d)
+
+if [ -f "/usr/bin/1pctl" ]; then
+    mv /usr/bin/1pctl ${tmp_dir}/1pctl
+    rm -f /usr/bin/1pctl /usr/local/bin/1pctl
+    mv ${tmp_dir}/1pctl /usr/local/bin
+    sed -i -e "s#/usr/bin#/usr/local/bin#g" /usr/local/bin/1pctl
+fi
+
+if [ -f "/usr/bin/1panel" ]; then
+    mv /usr/bin/1panel ${tmp_dir}/1panel
+    rm -f /usr/bin/1panel /usr/local/bin/1panel
+    mv ${tmp_dir}/1panel /usr/local/bin
+    sed -i -e "s#/usr/bin#/usr/local/bin#g" /etc/systemd/system/1panel.service
+    systemctl daemon-reload
+fi
+
+if [ -f "/usr/local/bin/1pctl" ]; then
     VERSION=$(grep "ORIGINAL_VERSION=" 1pctl | awk -F "=" '{print $2}')
-    ORIGINAL_VERSION=$(grep "ORIGINAL_VERSION=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    PANEL_PORT=$(grep "ORIGINAL_PORT=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    PANEL_USER=$(grep "ORIGINAL_USERNAME=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    PANEL_PASSWORD=$(grep "ORIGINAL_PASSWORD=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    PANEL_ENTRANCE=$(grep "ORIGINAL_ENTRANCE=" /usr/bin/1pctl | awk -F "=" '{print $2}')
-    INSTALL_DIR=$(grep "BASE_DIR=" /usr/bin/1pctl | awk -F "=" '{print $2}')
+    ORIGINAL_VERSION=$(grep "ORIGINAL_VERSION=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    PANEL_PORT=$(grep "ORIGINAL_PORT=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    PANEL_USER=$(grep "ORIGINAL_USERNAME=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    PANEL_PASSWORD=$(grep "ORIGINAL_PASSWORD=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    PANEL_ENTRANCE=$(grep "ORIGINAL_ENTRANCE=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
+    INSTALL_DIR=$(grep "BASE_DIR=" /usr/local/bin/1pctl | awk -F "=" '{print $2}')
 else
     echo -e "\033[31m[ERROR]: 1Panel is not installed \033[0m"
     exit 1
@@ -85,8 +102,8 @@ function upgrade_compose() {
 
 function check_1panel() {
     if [ -f "1panel" ] && [ -f "1panel.service" ]; then
-        if [ -f "/usr/bin/1panel" ]; then
-            if [ "$(md5sum /usr/bin/1panel | awk '{print $1}')" != "$(md5sum 1panel | awk '{print $1}')" ]; then
+        if [ -f "/usr/local/bin/1panel" ]; then
+            if [ "$(md5sum /usr/local/bin/1panel | awk '{print $1}')" != "$(md5sum 1panel | awk '{print $1}')" ]; then
                 upgrade_1panel
                 upgrade_1pctl
             fi
@@ -98,44 +115,41 @@ function upgrade_1panel() {
     if systemctl status 1panel | grep "running" >/dev/null 2>&1; then
         systemctl stop 1panel
     fi
-    if grep -q "/usr/local/bin" 1panel.service; then
-        sed -i -e "s#/usr/local/bin#/usr/bin#g" 1panel.service
-    fi
     if ! diff 1panel.service /etc/systemd/system/1panel.service >/dev/null 2>&1; then
-        cp 1panel.service /etc/systemd/system
+        cp -f 1panel.service /etc/systemd/system
         systemctl daemon-reload
     fi
-    cp -f 1panel /usr/bin
-    chown root:root /usr/bin/1panel
-    chmod 700 /usr/bin/1panel
+    cp -f 1panel /usr/local/bin
+    chown root:root /usr/local/bin/1panel
+    chmod 700 /usr/local/bin/1panel
     systemctl start 1panel
 }
 
 function upgrade_1pctl() {
-    cp -f 1pctl /usr/bin
-    chown root:root /usr/bin/1pctl
-    chmod 700 /usr/bin/1pctl
-    if grep -q "/usr/local/bin" /usr/bin/1pctl; then
-        sed -i -e "s#/usr/local/bin#/usr/bin#g" /usr/bin/1pctl
-    fi
-    sed -i -e "s#BASE_DIR=.*#BASE_DIR=${INSTALL_DIR}#g" /usr/bin/1pctl
-    sed -i -e "s#ORIGINAL_PORT=.*#ORIGINAL_PORT=${PANEL_PORT}#g" /usr/bin/1pctl
-    sed -i -e "s#ORIGINAL_USERNAME=.*#ORIGINAL_USERNAME=${PANEL_USER}#g" /usr/bin/1pctl
-    sed -i -e "s#ORIGINAL_PASSWORD=.*#ORIGINAL_PASSWORD=${PANEL_PASSWORD}#g" /usr/bin/1pctl
+    cp -f 1pctl /usr/local/bin
+    chown root:root /usr/local/bin/1pctl
+    chmod 700 /usr/local/bin/1pctl
+    sed -i -e "s#BASE_DIR=.*#BASE_DIR=${INSTALL_DIR}#g" /usr/local/bin/1pctl
+    sed -i -e "s#ORIGINAL_PORT=.*#ORIGINAL_PORT=${PANEL_PORT}#g" /usr/local/bin/1pctl
+    sed -i -e "s#ORIGINAL_USERNAME=.*#ORIGINAL_USERNAME=${PANEL_USER}#g" /usr/local/bin/1pctl
+    sed -i -e "s#ORIGINAL_PASSWORD=.*#ORIGINAL_PASSWORD=${PANEL_PASSWORD}#g" /usr/local/bin/1pctl
     if [ -z "${PANEL_ENTRANCE}" ]; then
-        sed -i -e "s#ORIGINAL_ENTRANCE=.*#ORIGINAL_ENTRANCE=''#g" /usr/bin/1pctl
+        sed -i -e "s#ORIGINAL_ENTRANCE=.*#ORIGINAL_ENTRANCE=''#g" /usr/local/bin/1pctl
     else
-        sed -i -e "s#ORIGINAL_ENTRANCE=.*#ORIGINAL_ENTRANCE=${PANEL_ENTRANCE}#g" /usr/bin/1pctl
+        sed -i -e "s#ORIGINAL_ENTRANCE=.*#ORIGINAL_ENTRANCE=${PANEL_ENTRANCE}#g" /usr/local/bin/1pctl
     fi
 }
 
 function get_host_ip() {
-  host=$(command -v ip &> /dev/null && ip addr | grep 'state UP' -A2 | grep inet | grep -Ev '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1)
+  local default_ip="127.0.0.1"
+  host=$(command -v hostname &>/dev/null && hostname -I | cut -d ' ' -f1)
   if [ ! "${host}" ]; then
-      host=$(hostname -I | cut -d ' ' -f1)
+      host=$(command -v ip &>/dev/null && ip addr | grep 'inet ' | grep -Ev '(127.0.0.1|inet6|docker)' | awk '{print $2}' | head -n 1 | cut -d / -f1)
   fi
   if [[ ${host} =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
       echo "${host}"
+  else
+      echo "${default_ip}"
   fi
 }
 
