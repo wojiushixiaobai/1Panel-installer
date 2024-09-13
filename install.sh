@@ -4,7 +4,7 @@
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit 1; pwd)
 cd "${PROJECT_DIR}" || exit 1
 
-VERSION=v1.7.4
+VERSION=v1.10.15-lts
 
 if [ ! "$(echo $PATH | grep /usr/local/bin)" ]; then
     export PATH=/usr/local/bin:$PATH
