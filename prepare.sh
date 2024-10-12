@@ -102,6 +102,8 @@ for ARCHITECTURE in x86_64 aarch64 s390x ppc64le; do
     cp -f docker.service "${BUILD_OFFLINE_DIR}"
     cp -f install.sh "${BUILD_DIR}"
     cp -f install.sh "${BUILD_OFFLINE_DIR}"
+    sed -i 's@/usr/bin/1panel@/usr/local/bin/1panel@g' "${BUILD_DIR}/1panel.service"
+    sed -i 's@/usr/bin/1panel@/usr/local/bin/1panel@g' "${BUILD_OFFLINE_DIR}/1panel.service"
     chmod +x "${BUILD_OFFLINE_DIR}/docker-compose"
     chmod +x "${BUILD_DIR}/install.sh" "${BUILD_OFFLINE_DIR}/install.sh"
 
