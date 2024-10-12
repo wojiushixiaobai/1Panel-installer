@@ -66,7 +66,7 @@ For more help options on how to use 1Panel, head to https://1panel.cn/docs/
 ### 卸载
 
 ```bash
-1panel uninstall
+1pctl uninstall
 ```
 
 ## 专业版
