@@ -11,6 +11,17 @@ Compose 手动安装请参考 [Compose 官方文档](https://docs.docker.com/com
 
 下载对应版本的离线安装包, 解压后运行 `install.sh` 或者 `upgrade.sh` 即可安装或者升级.
 
+| OS/Arch         | Arch      | Architecture  |
+| --------------- | --------- | ------------- |
+| `linux/amd64`   | `amd64`   | `x86_64`      |
+| `linux/arm64`   | `arm64`   | `aarch64`     |
+| `linux/arm/v6`  | `armv6`   | `armel`       |
+| `linux/arm/v7`  | `armv7`   | `armhf`       |
+| `linux/loong64` | `loong64` | `loongarch64` |
+| `linux/ppc64le` | `ppc64le` | `ppc64le`     |
+| `linux/riscv64` | `riscv64` | `riscv64`     |
+| `linux/s390x`   | `s390x`   | `s390x`       |
+
 ### 环境依赖
 
 请使用 `root` 用户执行安装脚本, 并且确保环境中已经存在下面命令:
