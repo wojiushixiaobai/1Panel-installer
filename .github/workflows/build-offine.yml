@@ -4,6 +4,7 @@ on:
       - master
   schedule:
     - cron: '0 2 * * *'
+  workflow_dispatch:
 
 name: Checkout and Create Release Version
 
