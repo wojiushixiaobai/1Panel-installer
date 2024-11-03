@@ -21,6 +21,10 @@ jobs:
           version=$(curl -s 'https://api.github.com/repos/wojiushixiaobai/1Panel/releases/latest' | jq -r ".tag_name")
           docker_version=$(curl -s 'https://api.github.com/repos/moby/moby/releases/latest' | jq -r ".tag_name")
           compose_version=$(curl -s 'https://api.github.com/repos/docker/compose/releases/latest' | jq -r ".tag_name")
+          if [ -z "${version}" ] || [ "${version}" == "null" ]; then
+            echo "Failed to get version"
+            exit 1
+          fi
           echo "version=${version}" >> $GITHUB_OUTPUT
           echo "app_version=${version}" >> $GITHUB_OUTPUT
           echo "docker_version=${docker_version/v/}" >> $GITHUB_OUTPUT
