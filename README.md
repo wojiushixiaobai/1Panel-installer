@@ -68,10 +68,23 @@ For more help options on how to use 1Panel, head to https://1panel.cn/docs/
 
 ### 升级
 
-~~升级没有参数, 直接执行即可.~~ 需要通过在线升级, 等待后续优化.
+升级没有参数, 直接执行即可 (由于版本被写死在数据库里面, 需要通过 sqlite3 命令处理).
 
 ```bash
 ./upgrade.sh
+```
+
+```sqlite
+# 请根据自己实际的安装路径修改 /opt/1panel/db/1Panel.db 
+sqlite3 /opt/1panel/db/1Panel.db
+
+# v1.10.21-lts 改成你升级后的版本号即可
+UPDATE settings SET value = 'v1.10.21-lts' WHERE key = 'SystemVersion';
+.exit
+```
+
+```bash
+systemctl restart 1panel
 ```
 
 ### 卸载
@@ -83,5 +96,3 @@ For more help options on how to use 1Panel, head to https://1panel.cn/docs/
 ## 专业版
 
 需要购买专业版可以使用推荐码 [78Ty5WXr](https://www.lxware.cn/?code=78Ty5WXr)，专业版功能请参考 [1Panel 官网](https://1panel.cn/)
-
-![二维码](qrcode.png)

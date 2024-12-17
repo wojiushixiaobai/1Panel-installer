@@ -66,6 +66,7 @@ PANEL_USER=${PANEL_USER:-"admin"}
 PANEL_PASSWORD=${PANEL_PASSWORD:-""}
 PANEL_ENTRANCE=${PANEL_ENTRANCE:-"secret"}
 INSTALL_DIR=${INSTALL_DIR:-"/opt/1panel"}
+INSTALL_DIR=${INSTALL_DIR%/1panel}
 INSTALL_CHECK=0
 
 if [ -f "/usr/local/bin/1pctl" ] && [ "${INSTALL_CHECK}" == "0" ]; then
