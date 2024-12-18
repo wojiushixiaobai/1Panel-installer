@@ -130,6 +130,7 @@ for ARCHITECTURE in aarch64 armel armhf loongarch64 ppc64le riscv64 s390x x86_64
     sed -i 's@/usr/bin/1panel@/usr/local/bin/1panel@g' "${BUILD_OFFLINE_DIR}/1panel.service"
     chmod +x "${BUILD_OFFLINE_DIR}/docker-compose"
     chmod +x "${BUILD_DIR}/install.sh" "${BUILD_OFFLINE_DIR}/install.sh"
+    chown -R root:root "${BUILD_DIR}" "${BUILD_OFFLINE_DIR}"
 
     cd "build/${APP_VERSION}" || exit 1
     tar -zcf "${BUILD_NAME}.tar.gz" "${BUILD_NAME}"

@@ -68,7 +68,7 @@ jobs:
         if: steps.check-build.outputs.build == 1
         run: |
           chmod +x prepare.sh
-          ./prepare.sh --app_version ${{ steps.get-version.outputs.app_version }} --docker_version ${{ steps.get-version.outputs.docker_version }} --compose_version ${{ steps.get-version.outputs.compose_version }}
+          sudo ./prepare.sh --app_version ${{ steps.get-version.outputs.app_version }} --docker_version ${{ steps.get-version.outputs.docker_version }} --compose_version ${{ steps.get-version.outputs.compose_version }}
 
       - name: Upgrade Release
         if: steps.check-build.outputs.build == 1

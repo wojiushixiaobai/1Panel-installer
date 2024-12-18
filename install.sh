@@ -213,6 +213,7 @@ function install_1panel() {
     if grep -q "/usr/bin/1panel" /etc/systemd/system/1panel.service; then
         sed -i 's@/usr/bin/1panel@/usr/local/bin/1panel@g' /etc/systemd/system/1panel.service
     fi
+    cp -rf lang /usr/local/bin
     cp -f 1panel /usr/local/bin
     chown root:root /usr/local/bin/1panel
     chmod 700 /usr/local/bin/1panel

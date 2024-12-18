@@ -119,6 +119,10 @@ function upgrade_1panel() {
         cp -f 1panel.service /etc/systemd/system
         systemctl daemon-reload
     fi
+    if [ -d "/usr/local/bin/lang" ]; then
+        rm -rf /usr/local/bin/lang
+    fi
+    cp -rf lang /usr/local/bin
     cp -f 1panel /usr/local/bin
     chown root:root /usr/local/bin/1panel
     chmod 700 /usr/local/bin/1panel
