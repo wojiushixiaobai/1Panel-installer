@@ -81,6 +81,8 @@ for ARCHITECTURE in aarch64 armel armhf loongarch64 ppc64le riscv64 s390x x86_64
     DOCKER_BIN_URL="https://download.docker.com/linux/static/stable/${ARCHITECTURE}/docker-${DOCKER_VERSION}.tgz"
     COMPOSE_BIN_URL="https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${ARCHITECTURE}"
 
+    OFFLINE_BUILD=""
+
     case "${ARCHITECTURE}" in
         "armel"|"armhf")
             COMPOSE_BIN_URL="https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${ARCH}"
@@ -89,8 +91,12 @@ for ARCHITECTURE in aarch64 armel armhf loongarch64 ppc64le riscv64 s390x x86_64
             DOCKER_BIN_URL="https://github.com/loong64/docker-ce-packaging/releases/download/v${DOCKER_VERSION}/docker-${DOCKER_VERSION}.tgz"
             COMPOSE_BIN_URL="https://github.com/loong64/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${ARCHITECTURE}"
             ;;
-        "ppc64le"|"riscv64"|"s390x")
+        "riscv64")
             DOCKER_BIN_URL="https://github.com/wojiushixiaobai/docker-ce-binaries-${ARCHITECTURE}/releases/download/v${DOCKER_VERSION}/docker-${DOCKER_VERSION}.tgz"
+            ;;
+        "ppc64le"|"s390x")
+            DOCKER_BIN_URL="https://github.com/wojiushixiaobai/docker-ce-binaries-${ARCHITECTURE}/releases/download/v${DOCKER_VERSION}/docker-${DOCKER_VERSION}.tgz"
+            OFFLINE_BUILD="false"
             ;;
     esac
 
@@ -110,7 +116,7 @@ for ARCHITECTURE in aarch64 armel armhf loongarch64 ppc64le riscv64 s390x x86_64
     rm -f "${BUILD_DIR}/install.sh"
     rm -f "${BUILD_OFFLINE_DIR}/install.sh"
 
-    if [ ! -f "${BUILD_OFFLINE_DIR}/docker.tgz" ]; then
+    if [ "${OFFLINE_BUILD}" != "false" ] && [ ! -f "${BUILD_OFFLINE_DIR}/docker.tgz" ]; then
         wget -q "${DOCKER_BIN_URL}" -O "${BUILD_OFFLINE_DIR}/docker.tgz"
     fi
 
@@ -134,7 +140,9 @@ for ARCHITECTURE in aarch64 armel armhf loongarch64 ppc64le riscv64 s390x x86_64
 
     cd "build/${APP_VERSION}" || exit 1
     tar -zcf "${BUILD_NAME}.tar.gz" "${BUILD_NAME}"
-    tar -zcf "${BUILD_OFFLINE_NAME}.tar.gz" "${BUILD_OFFLINE_NAME}"
+    if [ "${OFFLINE_BUILD}" != "false" ]; then
+        tar -zcf "${BUILD_OFFLINE_NAME}.tar.gz" "${BUILD_OFFLINE_NAME}"
+    fi
 done
 
 cd "${BASE_DIR}/build/${APP_VERSION}" || exit 1
