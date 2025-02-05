@@ -96,7 +96,7 @@ for ARCHITECTURE in aarch64 armel armhf loongarch64 ppc64le riscv64 s390x x86_64
             ;;
         "ppc64le"|"s390x")
             DOCKER_BIN_URL="https://github.com/wojiushixiaobai/docker-ce-binaries-${ARCHITECTURE}/releases/download/v${DOCKER_VERSION}/docker-${DOCKER_VERSION}.tgz"
-            OFFLINE_BUILD="false"
+            # OFFLINE_BUILD="false"
             ;;
     esac
 
