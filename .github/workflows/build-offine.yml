@@ -38,7 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check Buile
+      - name: Check Build
         id: check-build
         run: |
           gh release view ${{ steps.get-version.outputs.version }} -R ${{ github.repository }} | grep 1panel-.*-offline-linux-amd64.tar.gz >/dev/null 2>&1 || echo "build=1" >> $GITHUB_OUTPUT
